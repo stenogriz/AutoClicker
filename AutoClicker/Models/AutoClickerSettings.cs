@@ -25,5 +25,14 @@ namespace AutoClicker.Models
         public int PickedYValue { get; set; }
 
         public int SelectedTimesToRepeat { get; set; }
+
+        public int CooldownHours { get; set; }
+
+        public int CooldownMinutes { get; set; }
+
+        public int CooldownSeconds { get; set; }
+
+        public bool CooldownEnable { get; set; }
+
     }
 }

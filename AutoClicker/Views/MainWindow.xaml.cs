@@ -31,8 +31,10 @@ namespace AutoClicker.Views
            DependencyProperty.Register(nameof(AutoClickerSettings), typeof(AutoClickerSettings), typeof(MainWindow),
                new UIPropertyMetadata(SettingsUtils.CurrentSettings.AutoClickerSettings));
 
+        private bool cooldown = false;
         private int timesRepeated = 0;
         private readonly Timer clickTimer;
+        private readonly Timer cooldownTimer;
         private readonly Uri runningIconUri =
             new Uri(Constants.RUNNING_ICON_RESOURCE_PATH, UriKind.Relative);
 
@@ -52,6 +54,9 @@ namespace AutoClicker.Views
         {
             clickTimer = new Timer();
             clickTimer.Elapsed += OnClickTimerElapsed;
+
+            cooldownTimer = new Timer();
+            cooldownTimer.Elapsed += OnCooldownTimerElapsed;
 
             DataContext = this;
             ResetTitle();
@@ -124,6 +129,11 @@ namespace AutoClicker.Views
             clickTimer.Interval = interval;
             clickTimer.Start();
 
+            if (AutoClickerSettings.CooldownEnable)
+            {
+                cooldownTimer.Interval = (AutoClickerSettings.CooldownSeconds * 1000) + (AutoClickerSettings.CooldownMinutes * 60 * 1000) + (AutoClickerSettings.CooldownHours * 60 * 60 * 1000);
+            }
+
             Icon = new BitmapImage(runningIconUri);
             Title += Constants.MAIN_WINDOW_TITLE_RUNNING;
             systemTrayIcon.Text += Constants.MAIN_WINDOW_TITLE_RUNNING;
@@ -138,6 +148,7 @@ namespace AutoClicker.Views
         {
             Log.Information("Stopping operation");
             clickTimer.Stop();
+            cooldownTimer.Stop();
 
             ResetTitle();
             Icon = _defaultIcon;
@@ -145,12 +156,12 @@ namespace AutoClicker.Views
 
         private void StopCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = clickTimer.Enabled;
+            e.CanExecute = clickTimer.Enabled | cooldownTimer.Enabled;
         }
 
         private void ToggleCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            if (clickTimer.Enabled)
+            if (clickTimer.Enabled | cooldownTimer.Enabled)
                 StopCommand_Execute(sender, e);
             else
                 StartCommand_Execute(sender, e);
@@ -158,7 +169,7 @@ namespace AutoClicker.Views
 
         private void ToggleCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = CanStartOperation() | clickTimer.Enabled;
+            e.CanExecute = CanStartOperation() | clickTimer.Enabled | cooldownTimer.Enabled;
         }
 
         private void SaveSettingsCommand_Execute(object sender, ExecutedRoutedEventArgs e)
@@ -238,7 +249,7 @@ namespace AutoClicker.Views
 
         private bool CanStartOperation()
         {
-            return !clickTimer.Enabled && IsRepeatModeValid() && IsIntervalValid();
+            return !clickTimer.Enabled && IsRepeatModeValid() && IsIntervalValid() && !cooldownTimer.Enabled;
         }
 
         private int GetTimesToRepeat()
@@ -329,9 +340,28 @@ namespace AutoClicker.Views
 
                 if (timesRepeated == GetTimesToRepeat())
                 {
-                    clickTimer.Stop();
-                    ResetTitle();
+                    if (AutoClickerSettings.CooldownEnable && AutoClickerSettings.SelectedRepeatMode == RepeatMode.Count)
+                    {
+                        clickTimer.Stop();
+                        cooldownTimer.Start();
+                    } 
+                    else
+                    {
+                        clickTimer.Stop();
+                        ResetTitle();
+                    }
+                    
                 }
+            });
+        }
+
+        private void OnCooldownTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                timesRepeated = 0;
+                cooldownTimer.Stop();
+                clickTimer.Start();
             });
         }
 

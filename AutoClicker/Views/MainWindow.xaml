@@ -4,7 +4,7 @@
         xmlns:commands="clr-namespace:AutoClicker.Commands"
         xmlns:enums="clr-namespace:AutoClicker.Enums"
         ResizeMode="CanMinimize"
-        Height="320" Width="450">
+        Height="360" Width="450">
     <Window.Resources>
         <ResourceDictionary Source="../Resources/MainWindowResources.xaml"/>
     </Window.Resources>
@@ -54,6 +54,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -95,8 +96,49 @@
                 </Grid>
             </GroupBox>
 
+            <GroupBox Name="clickCooldowGroupBox" Header="Cooldown" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" IsEnabled="{Binding AutoClickerSettings.SelectedRepeatMode,
+                                                     Converter={StaticResource EnumToBooleanConverter},
+                                                     ConverterParameter={x:Static enums:RepeatMode.Count}}">
+                <GroupBox.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <Trigger Property="Control.IsEnabled" Value="False">
+                                <Setter Property="Control.Foreground" Value ="#FF6D6D6D" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </GroupBox.Style>
+                <Grid Name="clickCooldownInnerGrid" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0" Width="45"
+                 Text="{Binding AutoClickerSettings.CooldownHours, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <TextBlock Grid.Column="1" Margin="5, 0, 5, 5" Text="hours"/>
+                    <TextBox Grid.Column="2" Width="45"
+                 Text="{Binding AutoClickerSettings.CooldownMinutes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <TextBlock Grid.Column="3" Margin="5, 0, 5, 5" Text="minutes"/>
+                    <TextBox Grid.Column="4" Width="45"
+                 Text="{Binding AutoClickerSettings.CooldownSeconds, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    <TextBlock Grid.Column="5" Margin="5, 0, 5, 5" Text="seconds"/>
+                    <CheckBox Name="cooldownEnableCheckBox" Grid.Column="6" Margin="10, 0, 5, 5" Grid.ColumnSpan="2"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Content="Enable" IsChecked="{Binding AutoClickerSettings.CooldownEnable, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                </Grid>
+            </GroupBox>
+
             <GroupBox Name="clickRepeatGroupBox"
-                      Header="Click Repeat" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                      Header="Click Repeat" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
                 <Grid Name="clickRepeatInnerGrid"
                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Grid.RowDefinitions>
@@ -129,7 +171,7 @@
             </GroupBox>
 
             <GroupBox Name="clickPositionGroupBox"
-                      Header="Click Position" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
+                      Header="Click Position" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2">
                 <Grid Name="clickPositionInnerGrid"
                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Grid.RowDefinitions>
@@ -175,7 +217,7 @@
             </GroupBox>
 
             <GroupBox Name="clickOptionGroupBox"
-                      Header="Click Options" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">
+                      Header="Click Options" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
                 <UniformGrid Name="clickOptionInnerGrid"
                              HorizontalAlignment="Center" VerticalAlignment="Stretch" Rows="1" Columns="4">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Mouse Button"
