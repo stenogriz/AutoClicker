@@ -14,7 +14,8 @@ AutoClicker is a desktop application for automating mouse clicks.
 * Perform left button, right button or middle button mouse clicks.
 * Perform single click tasks, or double click tasks.
 * Perform clicks infinitely, or choose a limited number of times.
-* Perform clicks at the current cursor position, or choose a custom position. 
+* Perform clicks at the current cursor position, or choose a custom position.
+* Choose custom cooldown timeout between series of clicks (works with a finite click repeat setting)
 
 ## Platform
 Currently available only for Windows OS.
